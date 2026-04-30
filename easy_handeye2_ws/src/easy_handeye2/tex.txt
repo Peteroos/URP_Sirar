@@ -1,0 +1,179 @@
+终端 2 — RealSense + ArUco 检测（干净的 optical frame 输出）：
+
+# 先启动 realsense（你平时怎么启动就怎么启动）
+# 然后启动 detect_vis.py，确保用 optical 输出，不做坐标变换
+python3 ~/UR5e-Robot-Autonomously-Picks-Aruco-Markers-ROS-Noetic/ros2_aruco/detect_vis.py --ros-args \
+  -p publish_coordinate_convention:=optical \
+  -p swap_yz_translation:=false \
+  -p flip_z_translation:=false \
+  -p publish_tf_frame:=true \
+  -p marker_frame_name:=aruco_tag \
+  -p target_id:=27
+终端 3 — easy_handeye2 标定：
+
+
+source ~/easy_handeye2_ws/install/setup.bash
+ros2 launch easy_handeye2 calibrate.launch.py \
+  name:=ur10e_eye_in_hand \
+  calibration_type:=eye_in_hand \
+  robot_base_frame:=siraRbase \
+  robot_effector_frame:=siraRtool0_controller \
+  tracking_base_frame:=realsense_color_optical_frame \
+  tracking_marker_frame:=aruco_tag
+
+
+handeye_server-2] [INFO] [1777506813.419020454] [handeye_server]: Computed calibration: [[ 0.39454764  0.91478869  0.08656679 -0.26074642]
+[handeye_server-2]  [-0.91886145  0.39330766  0.03166593  0.28678727]
+[handeye_server-2]  [-0.00507974 -0.0920366   0.99574267  0.93796307]
+[handeye_server-2]  [ 0.          0.          0.          1.        ]]
+[handeye_server-2] [INFO] [1777506852.511791943] [handeye_server]: Calibration saved to /home/sirar/.ros2/easy_handeye2/calibrations/ur10e_eye_in_hand.calib
+
+rqt 窗口弹出后：
+
+用示教器手动移动 UR5e 到不同姿态（保持 ArUco 在视野内）
+每次旋转末端执行器到不同角度后，等稳定，点 Take Sample
+采 15~20 个样本，尽量覆盖各个旋转方向
+采够后点 Save 保存
+标定结果会存到 ~/.ros2/easy_handeye2/calibrations/ur5e_eye_in_hand.calib。
+
+你现在可以按顺序启动这三组了。如果哪一步有报错，贴给我看。
+
+sirar@sirar-T15:~$ ros2 launch easy_handeye2 calibrate.launch.py   name:=ur10e_eye_in_hand   calibration_type:=eye_in_hand   robot_base_frame:=base   robot_effector_frame:=tool0_controller   tracking_base_frame:=camera_color_optical_frame   tracking_marker_frame:=aruco_tag
+[INFO] [launch]: All log files can be found below /home/sirar/.ros/log/2026-04-29-19-18-51-579733-sirar-T15-37602
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [static_transform_publisher-1]: process started with pid [37606]
+[INFO] [handeye_server-2]: process started with pid [37608]
+[INFO] [rqt_calibrator.py-3]: process started with pid [37610]
+[static_transform_publisher-1] [INFO] [1777504731.714077318] [dummy_publisher]: Spinning until stopped - publishing transform
+[static_transform_publisher-1] translation: ('0.000000', '0.000000', '0.100000')
+[static_transform_publisher-1] rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+[static_transform_publisher-1] from 'tool0_controller' to 'camera_color_optical_frame'
+[handeye_server-2] [INFO] [1777504732.587965798] [handeye_server]: Read parameters for calibration "ur10e_eye_in_hand"
+[rqt_calibrator.py-3] [INFO] [1777504732.798297790] [handeye_rqt_calibrator]: Configuring HandeyeClient for calibration with namespace: ur10e_eye_in_hand
+[rqt_calibrator.py-3] [INFO] [1777504732.798630090] [handeye_rqt_calibrator]: Waiting for sampling services
+[handeye_server-2] [INFO] [1777504734.611001416] [handeye_server]: Checking that the expected transforms are available in tf
+[handeye_server-2] [INFO] [1777504734.611427378] [handeye_server]: Robot transform: base -> tool0_controller
+[handeye_server-2] [INFO] [1777504734.612598992] [handeye_server]: Tracking transform: camera_color_optical_frame -> aruco_tag
+[handeye_server-2] [ERROR] [1777504744.621430040] [handeye_server]: The specified tf frames for the robot base and hand do not seem to be connected
+[handeye_server-2] [ERROR] [1777504744.621690930] [handeye_server]: Run the following command and check its output:
+[handeye_server-2] [ERROR] [1777504744.621945134] [handeye_server]: ros2 run tf2_ros tf2_echo base tool0_controller
+[handeye_server-2] [ERROR] [1777504744.622674019] [handeye_server]: You may need to correct the base_frame or effector_frame argument passed to the easy_handeye2 launch file
+[handeye_server-2] [ERROR] [1777504744.622944479] [handeye_server]: Underlying tf exception: "base" passed to lookupTransform argument target_frame does not exist. 
+[handeye_server-2] [WARN] [1777504744.623231281] [handeye_server]: Waiting for TF initialization...
+[handeye_server-2] [INFO] [1777504744.625246257] [handeye_server]: Checking that the expected transforms are available in tf
+[handeye_server-2] [INFO] [1777504744.625692346] [handeye_server]: Robot transform: base -> tool0_controller
+[handeye_server-2] [INFO] [1777504744.627015385] [handeye_server]: Tracking transform: camera_color_optical_frame -> aruco_tag
+[handeye_server-2] [ERROR] [1777504754.635794415] [handeye_server]: The specified tf frames for the robot base and hand do not seem to be connected
+[handeye_server-2] [ERROR] [1777504754.637249098] [handeye_server]: Run the following command and check its output:
+[handeye_server-2] [ERROR] [1777504754.637489988] [handeye_server]: ros2 run tf2_ros tf2_echo base tool0_controller
+[handeye_server-2] [ERROR] [1777504754.637687215] [handeye_server]: You may need to correct the base_frame or effector_frame argument passed to the easy_handeye2 launch file
+[handeye_server-2] [ERROR] [1777504754.638050479] [handeye_server]: Underlying tf exception: "base" passed to lookupTransform argument target_frame does not exist. 
+[handeye_server-2] [WARN] [1777504754.638436696] [handeye_server]: Waiting for TF initialization...
+[handeye_server-2] [INFO] [1777504754.640675516] [handeye_server]: Checking that the expected transforms are available in tf
+[handeye_server-2] [INFO] [1777504754.640912158] [handeye_server]: Robot transform: base -> tool0_controller
+[handeye_server-2] [INFO] [1777504754.641110659] [handeye_server]: Tracking transform: camera_color_optical_frame -> aruco_tag
+[handeye_server-2] [ERROR] [1777504764.661798133] [handeye_server]: The specified tf frames for the robot base and hand do not seem to be connected
+[handeye_server-2] [ERROR] [1777504764.662757210] [handeye_server]: Run the following command and check its output:
+[handeye_server-2] [ERROR] [1777504764.663129976] [handeye_server]: ros2 run tf2_ros tf2_echo base tool0_controller
+[handeye_server-2] [ERROR] [1777504764.663440725] [handeye_server]: You may need to correct the base_frame or effector_frame argument passed to the easy_handeye2 launch file
+[handeye_server-2] [ERROR] [1777504764.663792814] [handeye_server]: Underlying tf exception: "base" passed to lookupTransform argument target_frame does not exist. 
+[handeye_server-2] [WARN] [1777504764.664600818] [handeye_server]: Waiting for TF initialization...
+[handeye_server-2] [INFO] [1777504764.665442929] [handeye_server]: Checking that the expected transforms are available in tf
+[handeye_server-2] [INFO] [1777504764.665689677] [handeye_server]: Robot transform: base -> tool0_controller
+[handeye_server-2] [INFO] [1777504764.665940365] [handeye_server]: Tracking transform: camera_color_optical_frame -> aruco_tag
+[handeye_server-2] [ERROR] [1777504774.671053933] [handeye_server]: The specified tf frames for the robot base and hand do not seem to be connected
+[handeye_server-2] [ERROR] [1777504774.671283719] [handeye_server]: Run the following command and check its output:
+[handeye_server-2] [ERROR] [1777504774.671483569] [handeye_server]: ros2 run tf2_ros tf2_echo base tool0_controller
+[handeye_server-2] [ERROR] [1777504774.671670479] [handeye_server]: You may need to correct the base_frame or effector_frame argument passed to the easy_handeye2 launch file
+[handeye_server-2] [ERROR] [1777504774.672061354] [handeye_server]: Underlying tf exception: "base" passed to lookupTransform argument target_frame does not exist. 
+[handeye_server-2] [WARN] [1777504774.672679314] [handeye_server]: Waiting for TF initialization...
+[handeye_server-2] [INFO] [1777504774.673417193] [handeye_server]: Checking that the expected transforms are available in tf
+[handeye_server-2] [INFO] [1777504774.673747262] [handeye_server]: Robot transform: base -> tool0_controller
+[handeye_server-2] [INFO] [1777504774.674196129] [handeye_server]: Tracking transform: camera_color_optical_frame -> aruco_tag
+^C[WARNING] [launch]: user interrupted with ctrl-c (SIGINT)
+[static_transform_publisher-1] [INFO] [1777504779.880313380] [rclcpp]: signal_handler(signum=2)
+[rqt_calibrator.py-3] [INFO] [1777504779.880313163] [rclcpp]: signal_handler(signum=2)
+[rqt_calibrator.py-3] PluginHandler.save_settings() plugin "easy_handeye2/RqtHandeyeCalibrator#0" raised an exception:
+[rqt_calibrator.py-3] Traceback (most recent call last):
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_handler.py", line 191, in save_settings
+[rqt_calibrator.py-3]     self._save_settings(plugin_settings, instance_settings)
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_handler_direct.py", line 114, in _save_settings
+[rqt_calibrator.py-3]     self.emit_save_settings_completed()
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_handler.py", line 207, in emit_save_settings_completed
+[rqt_calibrator.py-3]     callback(self._instance_id)
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_manager.py", line 462, in _close_application_save_callback
+[rqt_calibrator.py-3]     self._close_application_shutdown_plugins()
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_manager.py", line 469, in _close_application_shutdown_plugins
+[rqt_calibrator.py-3]     self._shutdown_plugin(
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_manager.py", line 355, in _shutdown_plugin
+[rqt_calibrator.py-3]     handler.close_signal.disconnect(self.unload_plugin)
+[rqt_calibrator.py-3] TypeError: disconnect() failed between 'close_signal' and 'unload_plugin'
+[rqt_calibrator.py-3] 
+[handeye_server-2] Exception in thread Thread-1 (run_func):
+[handeye_server-2] Traceback (most recent call last):
+[handeye_server-2]   File "/usr/lib/python3.10/threading.py", line 1016, in _bootstrap_inner
+[handeye_server-2]     self.run()
+[handeye_server-2]   File "/usr/lib/python3.10/threading.py", line 953, in run
+[handeye_server-2]     self._target(*self._args, **self._kwargs)
+[handeye_server-2]   File "/opt/ros/humble/lib/python3.10/site-packages/tf2_ros/transform_listener.py", line 95, in run_func
+[handeye_server-2]     self.executor.spin()
+[handeye_server-2]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 294, in spin
+[handeye_server-2]     self.spin_once()
+[handeye_server-2]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 751, in spin_once
+[handeye_server-2]     self._spin_once_impl(timeout_sec)
+[handeye_server-2]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 740, in _spin_once_impl
+[handeye_server-2]     handler, entity, node = self.wait_for_ready_callbacks(timeout_sec=timeout_sec)
+[handeye_server-2]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 723, in wait_for_ready_callbacks
+[handeye_server-2]     return next(self._cb_iter)
+[handeye_server-2]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/rclpy/executors.py", line 624, in _wait_for_ready_callbacks
+[handeye_server-2]     raise ExternalShutdownException()
+[handeye_server-2] rclpy.executors.ExternalShutdownException
+[rqt_calibrator.py-3] Traceback (most recent call last):
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_handler.py", line 191, in save_settings
+[rqt_calibrator.py-3]     self._save_settings(plugin_settings, instance_settings)
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_handler_direct.py", line 114, in _save_settings
+[rqt_calibrator.py-3]     self.emit_save_settings_completed()
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_handler.py", line 207, in emit_save_settings_completed
+[rqt_calibrator.py-3]     callback(self._instance_id)
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_manager.py", line 462, in _close_application_save_callback
+[rqt_calibrator.py-3]     self._close_application_shutdown_plugins()
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_manager.py", line 469, in _close_application_shutdown_plugins
+[rqt_calibrator.py-3]     self._shutdown_plugin(
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_manager.py", line 355, in _shutdown_plugin
+[rqt_calibrator.py-3]     handler.close_signal.disconnect(self.unload_plugin)
+[rqt_calibrator.py-3] TypeError: disconnect() failed between 'close_signal' and 'unload_plugin'
+[rqt_calibrator.py-3] 
+[rqt_calibrator.py-3] During handling of the above exception, another exception occurred:
+[rqt_calibrator.py-3] 
+[rqt_calibrator.py-3] Traceback (most recent call last):
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_manager.py", line 456, in close_application
+[rqt_calibrator.py-3]     self._save_settings(
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_manager.py", line 432, in _save_settings
+[rqt_calibrator.py-3]     self._save_plugin_settings(info['instance_id'], callback)
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_manager.py", line 343, in _save_plugin_settings
+[rqt_calibrator.py-3]     handler.save_settings(plugin_settings, instance_settings, callback)
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_handler.py", line 195, in save_settings
+[rqt_calibrator.py-3]     self.emit_save_settings_completed()
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_handler.py", line 202, in emit_save_settings_completed
+[rqt_calibrator.py-3]     self._call_method_on_all_dock_widgets('save_settings', self.__instance_settings)
+[rqt_calibrator.py-3]   File "/opt/ros/humble/local/lib/python3.10/dist-packages/qt_gui/plugin_handler.py", line 213, in _call_method_on_all_dock_widgets
+[rqt_calibrator.py-3]     settings = instance_settings.get_settings(name)
+[rqt_calibrator.py-3] AttributeError: 'NoneType' object has no attribute 'get_settings'
+[INFO] [static_transform_publisher-1]: process has finished cleanly [pid 37606]
+[rqt_calibrator.py-3] PluginHandler.load() failed
+[INFO] [rqt_calibrator.py-3]: process has finished cleanly [pid 37610]
+[handeye_server-2] [ERROR] [1777504784.674758723] [handeye_server]: The specified tf frames for the robot base and hand do not seem to be connected
+[handeye_server-2] Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:389
+[handeye_server-2] [ERROR] [1777504784.674983728] [handeye_server]: Run the following command and check its output:
+[handeye_server-2] Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:389
+[handeye_server-2] [ERROR] [1777504784.675171693] [handeye_server]: ros2 run tf2_ros tf2_echo base tool0_controller
+[handeye_server-2] Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:389
+[handeye_server-2] [ERROR] [1777504784.675358314] [handeye_server]: You may need to correct the base_frame or effector_frame argument passed to the easy_handeye2 launch file
+[handeye_server-2] Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:389
+[handeye_server-2] [ERROR] [1777504784.675546664] [handeye_server]: Underlying tf exception: "base" passed to lookupTransform argument target_frame does not exist. 
+[handeye_server-2] Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:389
+[handeye_server-2] [WARN] [1777504784.675779925] [handeye_server]: Waiting for TF initialization...
+[handeye_server-2] Failed to publish log message to rosout: publisher's context is invalid, at ./src/rcl/publisher.c:389
+[INFO] [handeye_server-2]: process has finished cleanly [pid 37608]
+
+
