@@ -26,3 +26,7 @@ bash launch.sh
 ## Known Issues
 
 **Controller input lag**: When controlling the robot via the controller, commands may occasionally experience delays, causing the control panel to become temporarily unresponsive. If this happens, wait a moment before retrying.
+
+## References
+
+Tsai, Roger Y., and Reimar K. Lenz. *"A new technique for fully autonomous and efficient 3D robotics hand/eye calibration."* Robotics and Automation, IEEE Transactions on 5.3 (1989): 345-358.
