@@ -57,6 +57,4 @@ source install/setup.bash
 - **[OpenCV ArUco](https://docs.opencv.org/4.x/d5/dae/tutorial_aruco_detection.html)**
 
 
-## References
 
-Tsai, Roger Y., and Reimar K. Lenz. *"A new technique for fully autonomous and efficient 3D robotics hand/eye calibration."* Robotics and Automation, IEEE Transactions on 5.3 (1989): 345-358.
