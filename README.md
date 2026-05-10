@@ -26,7 +26,7 @@ bash launch.sh
 
 ## Known Issues
 
-**Controller input lag**: When controlling the robot via the controller, commands may occasionally experience delays, causing the control panel to become temporarily unresponsive. If this happens, wait a moment before retrying.
+**Controller input lag**: When controlling the UR10e via the controller on the pad, commands may occasionally experience delays. If this happens, wait a moment before retrying.
 
 ## References
 
