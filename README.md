@@ -1,6 +1,7 @@
 # UR Robot Hand-Eye Calibration
 
-This project provides a hand-eye calibration pipeline for UR robotic arms. It computes a fixed transformation matrix from the robot's end-effector to the camera.
+This project provides a hand-eye calibration pipeline for Sirar(UR10e integrated). It computes a fixed transformation matrix from the robot's end-effector to the camera.
+Demostration Slides:https://docs.google.com/presentation/d/1D3loCp3H0gbYpcs1EuxtMUwCzaHyJtKeaBJJrywRvh8/edit?slide=id.g3db3c7251a3_0_0#slide=id.g3db3c7251a3_0_0
 
 ## Overview
 
